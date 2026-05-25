@@ -11,7 +11,6 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from django.contrib.auth import authenticate, get_user_model
-from django.db import IntegrityError
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -53,18 +52,13 @@ class UserService:
         password = validated_data['password']
         role = validated_data.get('role', User.Role.USER)
 
-        try:
-            return User.objects.create_user(
-                email=email,
-                password=password,
-                role=role,
-                first_name=validated_data.get('first_name', ''),
-                last_name=validated_data.get('last_name', ''),
-            )
-        except IntegrityError as exc:
-            raise RegistrationError(
-                'A user with this email already exists.',
-            ) from exc
+        return User.objects.create_user(
+            email=email,
+            password=password,
+            role=role,
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
+        )
 
     @classmethod
     def authenticate_user(cls, *, email: str, password: str) -> User:

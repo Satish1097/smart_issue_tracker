@@ -4,6 +4,7 @@ HTTP layer for the users app.
 Keep views thin: validate with serializers, delegate to services, format responses.
 """
 
+from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
@@ -21,7 +22,6 @@ from apps.users.serializers import (
 from apps.users.services import (
     AuthenticationError,
     PasswordChangeError,
-    RegistrationError,
     UserService,
 )
 
@@ -37,8 +37,10 @@ class RegisterView(APIView):
 
         try:
             user = UserService.register_user(serializer.validated_data)
-        except RegistrationError as exc:
-            raise ValidationError({'email': [str(exc)]}) from exc
+        except IntegrityError as exc:
+            raise ValidationError(
+                {'email': ['A user with this email already exists.']},
+            ) from exc
 
         return Response(
             {
