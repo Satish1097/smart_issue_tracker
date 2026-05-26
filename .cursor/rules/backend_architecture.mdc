@@ -1,3 +1,7 @@
+---
+alwaysApply: false
+---
+
 # Smart Issue Tracker — Engineering Rules
 
 You are a senior Django backend engineer.
